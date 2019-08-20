@@ -1,0 +1,40 @@
+---
+- name: Add Nginx Repository
+  apt_repository: repo='ppa:nginx/stable' state=present
+  register: ppastable
+
+- name: Install Nginx
+  apt: pkg=nginx state=installed update_cache=true
+  when: ppastable|success
+  register: nginxinstalled
+  notify:
+    - Start Nginx
+
+- name: Disable default site that still active
+  when: nginxinstalled|success
+  file: dest=/etc/nginx/sites-enabled/default state=absent
+
+- name: Create webroot directory
+  when: nginxinstalled|success
+  file: dest=/var/www/{{ '{{' }} domain {{ '}}'  }}/public mode=775 state=directory owner=www-data group=www-data
+  notify:
+    - Reload Nginx
+
+- name: Update webroot permission
+  when: nginxinstalled|success
+  file: dest=/var/www/{{ '{{' }} domain {{ '}}'  }} mode=775 state=directory owner=www-data group=www-data recurse=yes
+  notify:
+    - Reload Nginx
+
+- name: Copy web resource files
+  when: nginxinstalled|success
+  copy: src=web/index.html dest=/var/www/{{ '{{' }} domain {{ '}}'  }}/public owner=www-data group=www-data
+
+- name: Add Tokopedia nginx config
+  when: nginxinstalled|success
+  register: tokopediaconf
+  template: src=tokopedia.com.j2 dest=/etc/nginx/sites-available/{{ '{{' }} domain {{ '}}'  }}.conf owner=root group=root
+
+- name: Enable Tokopedia nginx config
+  when: tokopediaconf|success
+  file: src=/etc/nginx/sites-available/{{ '{{' }} domain {{ '}}'  }}.conf dest=/etc/nginx/sites-enabled/{{ '{{' }} domain {{ '}}'  }}.conf state=link
