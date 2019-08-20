@@ -39,11 +39,5 @@
   when: tokopediaconf|success
   file: src=/etc/nginx/sites-available/{{ domain }}.conf dest=/etc/nginx/sites-enabled/{{ domain }}.conf state=link
 
-- name: Start Nginx
-  service: name=nginx state=started
-
-- name: Reload Nginx
-  service: name=nginx state=reloaded
-
 - name: Restart Nginx
-  service: name=nginx state=restarted
+  command: service nginx restart
