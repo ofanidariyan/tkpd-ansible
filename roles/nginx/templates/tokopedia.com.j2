@@ -2,11 +2,11 @@ server {
 	listen 80 default_server;
 	listen [::]:80 default_server;
 
-	root /var/www/{{ '{{' }} domain {{ '}}'  }}/public;
+	root /var/www/{{ domain }}/public;
     index index.html index.htm index.php;
 
-    access_log /var/log/nginx/{{ '{{' }} domain {{ '}}'  }}.log;
-    error_log  /var/log/nginx/{{ '{{' }} domain {{ '}}'  }}-error.log error;
+    access_log /var/log/nginx/{{ domain }}-access.log;
+    error_log  /var/log/nginx/{{ domain }}-error.log error;
 
 	# Add index.php to the list if you are using PHP
 	index index.html index.htm index.nginx-debian.html;
