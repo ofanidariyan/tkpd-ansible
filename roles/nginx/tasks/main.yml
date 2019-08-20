@@ -14,6 +14,18 @@
   when: installednginx|success
   file: dest=/etc/nginx/sites-enabled/default state=absent
 
+- name: Create webroot directory
+  when: installednginx|success
+  file: dest=/var/www/{{ domain }}/public mode=775 state=directory owner=www-data group=www-data
+  notify:
+    - Reload Nginx
+
+- name: Update webroot permission
+  when: installednginx|success
+  file: dest=/var/www/{{ domain }} mode=775 state=directory owner=www-data group=www-data recurse=yes
+  notify:
+    - Reload Nginx
+
 - name: Copy web resource files
   when: installednginx|success
   copy: src=web/index.html dest=/var/www/{{ domain }}/public owner=www-data group=www-data
@@ -26,15 +38,12 @@
 - name: Enable Tokopedia nginx config
   when: tokopediaconf|success
   file: src=/etc/nginx/sites-available/{{ domain }}.conf dest=/etc/nginx/sites-enabled/{{ domain }}.conf state=link
-  
-- name: Create webroot directory
-  when: installednginx|success
-  file: dest=/var/www/{{ domain }}/public mode=775 state=directory owner=www-data group=www-data
-  notify:
-    - Reload Nginx
 
-- name: Update webroot permission
-  when: installednginx|success
-  file: dest=/var/www/{{ domain }} mode=775 state=directory owner=www-data group=www-data recurse=yes
-  notify:
-    - Reload Nginx
+- name: Start Nginx
+  service: name=nginx state=started
+
+- name: Reload Nginx
+  service: name=nginx state=reloaded
+
+- name: Restart Nginx
+  service: name=nginx state=restarted
