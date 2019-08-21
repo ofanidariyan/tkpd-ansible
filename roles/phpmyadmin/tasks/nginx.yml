@@ -1,0 +1,19 @@
+---
+- name: check if nginx is installed
+  stat:
+    path: /etc/nginx/conf.d
+  changed_when: false
+  register: phpmyadmin_nginx_config_dir_stat
+
+- name: ensure directory for global nginx configuration files exists
+  file:
+    path: /etc/nginx/global.d
+    state: directory
+  when: phpmyadmin_nginx_config_dir_stat.stat.exists
+
+- name: ensure phpmyadmin configuration for nginx is installed
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/global.d/phpmyadmin.conf
+  notify: reload nginx
+  when: phpmyadmin_nginx_config_dir_stat.stat.exists
