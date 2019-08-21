@@ -25,17 +25,16 @@
   file: dest=/var/www/{{ domain }} mode=775 state=directory owner=www-data group=www-data recurse=yes
   notify:
     - Reload Nginx
+    -
+- name: Copy and unzip webfile
+  unarchive: src=web/web.tar.gz dest=/var/www/{{ domain }}/public remote_src=true
 
-- name: Copy web resource files
-  when: installednginx|success
-  copy: src=web/index.html dest=/var/www/{{ domain }}/public owner=www-data group=www-data
-
-- name: Add Tokopedia nginx config
+- name: Add new nginx config
   when: installednginx|success
   register: tokopediaconf
   template: src=tokopedia.com.j2 dest=/etc/nginx/sites-available/{{ domain }}.conf owner=root group=root
 
-- name: Enable Tokopedia nginx config
+- name: Enable nginx config
   when: tokopediaconf|success
   file: src=/etc/nginx/sites-available/{{ domain }}.conf dest=/etc/nginx/sites-enabled/{{ domain }}.conf state=link
 

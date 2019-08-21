@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-RUN apt-get update && apt-get install -y openssh-server net-tools iputils-ping software-properties-common git-core
+RUN apt-get update && apt-get install -y openssh-server net-tools iputils-ping software-properties-common git-core nano
 RUN mkdir /var/run/sshd
 RUN echo 'root:tokopedia123' | chpasswd
 RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
