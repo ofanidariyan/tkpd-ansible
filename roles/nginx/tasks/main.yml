@@ -20,14 +20,14 @@
   notify:
     - Reload Nginx
 
+- name: Copy and unzip webfile
+  unarchive: src=web/web.tar.gz dest=/var/www/{{ domain }}/public
+
 - name: Update webroot permission
   when: installednginx|success
   file: dest=/var/www/{{ domain }} mode=775 state=directory owner=www-data group=www-data recurse=yes
   notify:
     - Reload Nginx
-    -
-- name: Copy and unzip webfile
-  unarchive: src=web/web.tar.gz dest=/var/www/{{ domain }}/public remote_src=true
 
 - name: Add new nginx config
   when: installednginx|success
